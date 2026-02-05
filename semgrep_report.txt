@@ -1,0 +1,321 @@
+                    
+                    
+┌──────────────────┐
+│ 47 Code Findings │
+└──────────────────┘
+                                               
+  [36m[22m[24m  SecLists/.bin/xml-parser.py [0m
+       [1m[24mpython.lang.security.use-defused-xml-parse.use-defused-xml-parse[0m                   
+          The native Python `xml` library is vulnerable to XML External Entity (XXE) attacks.  These
+          attacks can leak confidential data and "XML bombs" can cause denial of service. Do not use
+          this library to parse untrusted input. Instead  the Python documentation recommends using 
+          `defusedxml`.                                                                             
+          Details: https://sg.run/n3jG                                                              
+                                                                                                    
+  [32m[22m[24m         ▶▶┆ Autofix ▶[0m defusedxml.etree.ElementTree.parse(i)
+           18┆ xml_file = [1m[24met.parse(i)[0m
+                                                        
+  [36m[22m[24m  SecLists/Fuzzing/0-999999-hashgen.py [0m
+       [1m[24mpython.lang.security.insecure-hash-algorithms.insecure-hash-algorithm-sha1[0m         
+          Detected SHA1 hash algorithm which is considered insecure. SHA1 is not collision resistant
+          and is therefore not suitable as a cryptographic signature. Use SHA256 or SHA3 instead.   
+          Details: https://sg.run/ydYx                                                              
+                                                                                                    
+  [32m[22m[24m         ▶▶┆ Autofix ▶[0m hashlib.sha256()
+           18┆ sha1_hash = [1m[24mhashlib.sha1()[0m
+            ⋮┆----------------------------------------
+       [1m[24mpython.lang.security.audit.sha224-hash.sha224-hash[0m                                  
+          This code uses a 224-bit hash function, which is deprecated or disallowed in some security 
+          policies. Consider updating to a stronger hash function such as SHA-384 or higher to ensure
+          compliance and security.                                                                   
+          Details: https://sg.run/Db1Yv                                                              
+                                                                                                     
+           23┆ sha224_hash = [1m[24mhashlib.sha224()[0m
+                                                          
+  [36m[22m[24m  SecLists/Web-Shells/CFM/shell.cfm.html [0m
+       [1m[24mpython.django.security.django-no-csrf-token.django-no-csrf-token[0m               
+          Manually-created forms in django templates should specify a csrf_token to prevent CSRF
+          attacks.                                                                              
+          Details: https://sg.run/N0Bp                                                          
+                                                                                                
+           21┆ [1m[24m<form enctype="multipart/form-data" method="post">[0m
+           22┆ [1m[24m<input type="file" name="fileUpload" /><br />[0m
+           23┆ [1m[24m<input type="submit" value="Upload File" />[0m
+           24┆ [1m[24m</form>[0m
+            ⋮┆----------------------------------------
+           28┆ [1m[24m<form method="POST" action="">[0m
+           29┆ [1m[24m<tr><td>Command:</td><td><input type=text name="cmd" size=50[0m
+           30┆ [1m[24m <cfif isdefined("form.cmd")>value="#form.cmd#"</cfif>><br></td></tr>[0m
+           31┆ [1m[24m<tr><td>Options:</td><td> <input type=text name="opts" size=50[0m
+           32┆ [1m[24m <cfif isdefined("form.opts")>value="#form.opts#"</cfif>><br></td></tr>[0m
+           33┆ [1m[24m<tr><td>Timeout:</td><td> <input type=text name="timeout" size=4[0m
+           34┆ [1m[24m <cfif isdefined("form.timeout")>value="#form.timeout#"[0m
+           35┆ [1m[24m <cfelse>value="5"</cfif>></td></tr>[0m
+           36┆ [1m[24m</table>[0m
+           37┆ [1m[24m<input type=submit value="Exec" >[0m
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+                                                             
+  [36m[22m[24m  SecLists/Web-Shells/FuzzDB/cmd-simple.php [0m
+       [1m[24mphp.lang.security.injection.tainted-exec.tainted-exec[0m                             
+          User input is passed to a function that executes a shell command. This can lead to remote
+          code execution.                                                                          
+          Details: https://sg.run/kxEEz                                                            
+                                                                                                   
+            8┆ [1m[24msystem($cmd)[0m;
+            ⋮┆----------------------------------------
+       [1m[24mphp.lang.security.tainted-exec.tainted-exec[0m                                 
+          Executing non-constant commands. This can lead to command injection. You should use
+          `escapeshellarg()` when using command.                                             
+          Details: https://sg.run/JAkP                                                       
+                                                                                             
+            8┆ [1m[24msystem($cmd)[0m;
+            ⋮┆----------------------------------------
+       [1m[24mphp.lang.security.exec-use.exec-use[0m                          
+          Executing non-constant commands. This can lead to command injection.
+          Details: https://sg.run/5Q1j                                        
+                                                                              
+            8┆ [1m[24msystem($cmd);[0m
+                                                      
+  [36m[22m[24m  SecLists/Web-Shells/FuzzDB/cmd.php [0m
+       [1m[24mphp.lang.security.injection.tainted-exec.tainted-exec[0m                             
+          User input is passed to a function that executes a shell command. This can lead to remote
+          code execution.                                                                          
+          Details: https://sg.run/kxEEz                                                            
+                                                                                                   
+           19┆ [1m[24msystem($_GET['cmd'])[0m;
+            ⋮┆----------------------------------------
+       [1m[24mphp.lang.security.tainted-exec.tainted-exec[0m                                 
+          Executing non-constant commands. This can lead to command injection. You should use
+          `escapeshellarg()` when using command.                                             
+          Details: https://sg.run/JAkP                                                       
+                                                                                             
+           19┆ [1m[24msystem($_GET['cmd'])[0m;
+            ⋮┆----------------------------------------
+       [1m[24mphp.lang.security.exec-use.exec-use[0m                          
+          Executing non-constant commands. This can lead to command injection.
+          Details: https://sg.run/5Q1j                                        
+                                                                              
+           19┆ [1m[24msystem($_GET['cmd']);[0m
+                                                       
+  [36m[22m[24m  SecLists/Web-Shells/FuzzDB/list.php [0m
+       [1m[24mphp.lang.security.injection.tainted-filename.tainted-filename[0m
+          File name based on user input risks server-side request forgery.    
+          Details: https://sg.run/Ayqp                                        
+                                                                              
+           27┆ $fp = fopen([1m[24m$fichero[0m, "r");
+            ⋮┆----------------------------------------
+           28┆ $buffer = fread($fp, filesize([1m[24m$fichero[0m));
+                                                                   
+  [36m[22m[24m  SecLists/Web-Shells/Magento/newadmin-Inchoo.php [0m
+       [1m[24mphp.lang.security.unlink-use.unlink-use[0m                                            
+          Using user input when deleting files with `unlink()` is potentially dangerous. A malicious
+          actor could use this to modify or access files they have no right to.                     
+          Details: https://sg.run/rYeR                                                              
+                                                                                                    
+           77┆ @[1m[24munlink(__FILE__)[0m;
+                                                                         
+  [36m[22m[24m  SecLists/Web-Shells/Magento/newadmin-KINKCreative.php [0m
+       [1m[24mphp.lang.security.unlink-use.unlink-use[0m                                            
+          Using user input when deleting files with `unlink()` is potentially dangerous. A malicious
+          actor could use this to modify or access files they have no right to.                     
+          Details: https://sg.run/rYeR                                                              
+                                                                                                    
+           68┆ @[1m[24munlink(__FILE__)[0m;
+                                                                           
+  [36m[22m[24m  SecLists/Web-Shells/PHP/another-obfuscated-phpshell.php [0m
+       [1m[24mphp.lang.security.injection.tainted-exec.tainted-exec[0m                             
+          User input is passed to a function that executes a shell command. This can lead to remote
+          code execution.                                                                          
+          Details: https://sg.run/kxEEz                                                            
+                                                                                                   
+            9┆ [1m[24mexec("$P 2>&1", $arr)[0m;
+            ⋮┆----------------------------------------
+       [1m[24mphp.lang.security.tainted-exec.tainted-exec[0m                                 
+          Executing non-constant commands. This can lead to command injection. You should use
+          `escapeshellarg()` when using command.                                             
+          Details: https://sg.run/JAkP                                                       
+                                                                                             
+            9┆ [1m[24mexec("$P 2>&1", $arr)[0m;
+            ⋮┆----------------------------------------
+       [1m[24mphp.lang.security.exec-use.exec-use[0m                          
+          Executing non-constant commands. This can lead to command injection.
+          Details: https://sg.run/5Q1j                                        
+                                                                              
+            9┆ [1m[24mexec("$P 2>&1", $arr);[0m
+                                                                   
+  [36m[22m[24m  SecLists/Web-Shells/PHP/obfuscated-phpshell.php [0m
+       [1m[24mphp.lang.security.md5-loose-equality.md5-loose-equality[0m                          
+          Make sure comparisons involving md5 values are strict (use `===` not `==`) to avoid type
+          juggling issues                                                                         
+          Details: https://sg.run/Do4G                                                            
+                                                                                                  
+           13┆ if([1m[24m$pass == md5($_POST['password'])[0m)
+                                                                                           
+  [36m[22m[24m  SecLists/Web-Shells/Vtiger/modules/VtigerVulnPlugin/actions/Gateway.php [0m
+       [1m[24mphp.lang.security.exec-use.exec-use[0m                          
+          Executing non-constant commands. This can lead to command injection.
+          Details: https://sg.run/5Q1j                                        
+                                                                              
+           20┆ [1m[24msystem($request->get("cmd"));[0m
+                                                                           
+  [36m[22m[24m  SecLists/Web-Shells/Vtiger/settings/actions/Gateway.php [0m
+       [1m[24mphp.lang.security.exec-use.exec-use[0m                          
+          Executing non-constant commands. This can lead to command injection.
+          Details: https://sg.run/5Q1j                                        
+                                                                              
+           16┆ [1m[24msystem($request->get("cmd"));[0m
+                                                                  
+  [36m[22m[24m  SecLists/Web-Shells/WordPress/bypass-login.php [0m
+       [1m[24mphp.lang.security.unlink-use.unlink-use[0m                                            
+          Using user input when deleting files with `unlink()` is potentially dangerous. A malicious
+          actor could use this to modify or access files they have no right to.                     
+          Details: https://sg.run/rYeR                                                              
+                                                                                                    
+            2┆ @[1m[24munlink(__FILE__)[0m;
+                                                                  
+  [36m[22m[24m  SecLists/Web-Shells/WordPress/plugin-shell.php [0m
+       [1m[24mphp.lang.security.exec-use.exec-use[0m                          
+          Executing non-constant commands. This can lead to command injection.
+          Details: https://sg.run/5Q1j                                        
+                                                                              
+           13┆ [1m[24m@system("chmod ugo-w $this_file");[0m
+            ⋮┆----------------------------------------
+           14┆ [1m[24m@system("chattr +i $this_file");[0m
+            ⋮┆----------------------------------------
+           24┆ [1m[24mexecuteCommand($command);[0m
+            ⋮┆----------------------------------------
+           70┆ [1m[24mpassthru($command , $return_var);[0m
+            ⋮┆----------------------------------------
+           80┆ [1m[24msystem($command);[0m
+                                                                 
+  [36m[22m[24m  SecLists/Web-Shells/laudanum-1.0/php/file.php [0m
+       [1m[24mphp.lang.security.injection.tainted-filename.tainted-filename[0m
+          File name based on user input risks server-side request forgery.    
+          Details: https://sg.run/Ayqp                                        
+                                                                              
+          101┆ if(file_exists([1m[24m$file[0m)) {
+            ⋮┆----------------------------------------
+          106┆ header("Content-Length: ".filesize([1m[24m$file[0m));
+            ⋮┆----------------------------------------
+          108┆ readfile([1m[24m$file[0m);
+                                                                  
+  [36m[22m[24m  SecLists/Web-Shells/laudanum-1.0/php/proxy.php [0m
+       [1m[24mphp.lang.security.injection.tainted-filename.tainted-filename[0m
+          File name based on user input risks server-side request forgery.    
+          Details: https://sg.run/Ayqp                                        
+                                                                              
+          294┆ $fp = fopen([1m[24mbuildurl($url_c)[0m, "rb");
+                                                                  
+  [36m[22m[24m  SecLists/Web-Shells/laudanum-1.0/php/shell.php [0m
+       [1m[24mphp.lang.security.md5-loose-equality.md5-loose-equality[0m                          
+          Make sure comparisons involving md5 values are strict (use `===` not `==`) to avoid type
+          juggling issues                                                                         
+          Details: https://sg.run/Do4G                                                            
+                                                                                                  
+          160┆ $_SESSION['authenticated'] = ([1m[24m$users[$username] == hash("sha1", $password)[0m);
+            ⋮┆----------------------------------------
+          215┆ if ([1m[24m$new_dir == ''[0m) $new_dir = '/';
+            ⋮┆----------------------------------------
+       [1m[24mphp.lang.security.exec-use.exec-use[0m                          
+          Executing non-constant commands. This can lead to command injection.
+          Details: https://sg.run/5Q1j                                        
+                                                                              
+          246┆ [1m[24m$p = proc_open($command,[0m
+          247┆ [1m[24m               array(1 => array('pipe', 'w'),[0m
+          248┆ [1m[24m                     2 => array('pipe', 'w')),[0m
+          249┆ [1m[24m               $io);[0m
+            ⋮┆----------------------------------------
+       [1m[24mphp.lang.security.injection.tainted-exec.tainted-exec[0m                             
+          User input is passed to a function that executes a shell command. This can lead to remote
+          code execution.                                                                          
+          Details: https://sg.run/kxEEz                                                            
+                                                                                                   
+          246┆ $p = [1m[24mproc_open($command,[0m
+          247┆ [1m[24m               array(1 => array('pipe', 'w'),[0m
+          248┆ [1m[24m                     2 => array('pipe', 'w')),[0m
+          249┆ [1m[24m               $io)[0m;
+            ⋮┆----------------------------------------
+       [1m[24mphp.lang.security.tainted-exec.tainted-exec[0m                                 
+          Executing non-constant commands. This can lead to command injection. You should use
+          `escapeshellarg()` when using command.                                             
+          Details: https://sg.run/JAkP                                                       
+                                                                                             
+          246┆ $p = [1m[24mproc_open($command,[0m
+          247┆ [1m[24m               array(1 => array('pipe', 'w'),[0m
+          248┆ [1m[24m                     2 => array('pipe', 'w')),[0m
+          249┆ [1m[24m               $io)[0m;
+                                                                                 
+  [36m[22m[24m  SecLists/Web-Shells/laudanum-1.0/wordpress/templates/file.php [0m
+       [1m[24mphp.lang.security.injection.tainted-filename.tainted-filename[0m
+          File name based on user input risks server-side request forgery.    
+          Details: https://sg.run/Ayqp                                        
+                                                                              
+           87┆ if(file_exists([1m[24m$file[0m)) {
+            ⋮┆----------------------------------------
+           92┆ header("Content-Length: ".filesize([1m[24m$file[0m));
+            ⋮┆----------------------------------------
+           94┆ readfile([1m[24m$file[0m);
+                                                                                  
+  [36m[22m[24m  SecLists/Web-Shells/laudanum-1.0/wordpress/templates/proxy.php [0m
+       [1m[24mphp.lang.security.injection.tainted-filename.tainted-filename[0m
+          File name based on user input risks server-side request forgery.    
+          Details: https://sg.run/Ayqp                                        
+                                                                              
+          279┆ $fp = fopen([1m[24mbuildurl($url_c)[0m, "rb");
+                                                                                  
+  [36m[22m[24m  SecLists/Web-Shells/laudanum-1.0/wordpress/templates/shell.php [0m
+       [1m[24mphp.lang.security.md5-loose-equality.md5-loose-equality[0m                          
+          Make sure comparisons involving md5 values are strict (use `===` not `==`) to avoid type
+          juggling issues                                                                         
+          Details: https://sg.run/Do4G                                                            
+                                                                                                  
+          139┆ $_SESSION['authenticated'] = ([1m[24m$users[$username] == hash("sha1", $password)[0m);
+            ⋮┆----------------------------------------
+          195┆ if ([1m[24m$new_dir == ''[0m) $new_dir = '/';
+            ⋮┆----------------------------------------
+       [1m[24mphp.lang.security.exec-use.exec-use[0m                          
+          Executing non-constant commands. This can lead to command injection.
+          Details: https://sg.run/5Q1j                                        
+                                                                              
+          226┆ [1m[24m$p = proc_open($command,[0m
+          227┆ [1m[24m               array(1 => array('pipe', 'w'),[0m
+          228┆ [1m[24m                     2 => array('pipe', 'w')),[0m
+          229┆ [1m[24m               $io);[0m
+            ⋮┆----------------------------------------
+       [1m[24mphp.lang.security.injection.tainted-exec.tainted-exec[0m                             
+          User input is passed to a function that executes a shell command. This can lead to remote
+          code execution.                                                                          
+          Details: https://sg.run/kxEEz                                                            
+                                                                                                   
+          226┆ $p = [1m[24mproc_open($command,[0m
+          227┆ [1m[24m               array(1 => array('pipe', 'w'),[0m
+          228┆ [1m[24m                     2 => array('pipe', 'w')),[0m
+          229┆ [1m[24m               $io)[0m;
+            ⋮┆----------------------------------------
+       [1m[24mphp.lang.security.tainted-exec.tainted-exec[0m                                 
+          Executing non-constant commands. This can lead to command injection. You should use
+          `escapeshellarg()` when using command.                                             
+          Details: https://sg.run/JAkP                                                       
+                                                                                             
+          226┆ $p = [1m[24mproc_open($command,[0m
+          227┆ [1m[24m               array(1 => array('pipe', 'w'),[0m
+          228┆ [1m[24m                     2 => array('pipe', 'w')),[0m
+          229┆ [1m[24m               $io)[0m;
+                             
+  [36m[22m[24m  config.py [0m
+       [1m[24mpython.flask.security.audit.hardcoded-config.avoid_hardcoded_config_SECRET_KEY[0m      
+          Hardcoded variable `SECRET_KEY` detected. Use environment variables or config files instead
+          Details: https://sg.run/Ekde                                                               
+                                                                                                     
+           13┆ [1m[24mvuln_app.app.config['SECRET_KEY'] = 'random'[0m
+                                              
+  [36m[22m[24m  openapi_specs/openapi3.yml [0m
+       [1m[24mgeneric.secrets.security.detected-jwt-token.detected-jwt-token[0m
+          JWT token detected                                                   
+          Details: https://sg.run/05N5                                         
+                                                                               
+          193┆  ...                                                                                                     
+  [1m[24meyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NzAxNjA2MTcsImlhdCI6MTY3MDE2MDU1Nywic3ViIjoiSm9obi5Eb2UifQ.[0m
+  n17N4AxTbL4_z65-NR46meoytauPDjImUxrLiUM ... [0m                                                                       
+            [shortened a long line from output, adjust with --max-chars-per-line]
+
