@@ -1,22 +1,51 @@
-# --- 4. DYNAMIC ANALYSIS (OWASP ZAP) ---
+name: DevSecOps-Full-Audit-All-Reports
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  security-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # --- 1. JALANKAN SCRIPT SH (FULL REPORT) ---
+      - name: Run Scan Otomatis Script
+        run: |
+          chmod +x scan_otomatis.sh
+          # Menjalankan script kamu dan menyimpan seluruh output terminal ke satu file
+          ./scan_otomatis.sh > hasil_scan_lengkap.txt 2>&1 || true
+
+      # --- 2. HADOLINT (REPORT PER TOOL) ---
+      - name: Run Hadolint
+        run: |
+          docker run --rm -v $(pwd):/root:ro hadolint/hadolint < Dockerfile > hadolint-report.txt || true
+
+      # --- 3. TRIVY (REPORT PER TOOL) ---
+      - name: Run Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy fs --severity HIGH,CRITICAL . > trivy-report.txt || true
+
+      # --- 4. PREPARASI APLIKASI UNTUK ZAP ---
+      - name: Build and Run VAmPI
+        run: |
+          docker build -t vampi-app .
+          docker run -d --name vampi-instance -p 5000:5000 vampi-app
+          sleep 15
+
+      # --- 5. RUN ZAP ---
       - name: Run ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.13.0
         with:
           target: 'http://localhost:5000'
-          fail_action: false 
+          fail_action: false
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # --- 5. BACA HASIL SCAN KE VARIABLE ---
-      - name: Prepare Scan Results for Email
-        if: always()
-        run: |
-          # Ambil hasil ringkasan ZAP (jika ada file report yang terbuat)
-          # Untuk contoh ini, kita buat ringkasan teks sederhana
-          echo "HADOLINT_LOG=$(docker run --rm -v $(pwd):/root:ro hadolint/hadolint < Dockerfile | head -n 10)" >> $GITHUB_ENV
-          echo "TRIVY_LOG=$(trivy fs --severity HIGH,CRITICAL . | grep -A 10 "Total")" >> $GITHUB_ENV
-
-      # --- 6. KIRIM EMAIL DENGAN DETAIL SCAN ---
-      - name: Send Full Audit Report
+      # --- 6. KIRIM EMAIL DENGAN SEMUA LAMPIRAN ---
+      - name: Send Email with All Attachments
         if: always()
         uses: dawidd6/action-send-mail@v3
         with:
@@ -24,20 +53,18 @@
           server_port: 465
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "🛡️ [DETAILED REPORT] Audit Keamanan Selesai"
+          subject: "🛡️ [COMPLETE AUDIT] Reports for ${{ github.repository }}"
           to: rizkyaryendigumilang@gmail.com
           from: DevSecOps Automation Bot
           body: |
-            Halo Rizky, berikut adalah detail hasil scan otomatis:
+            Halo Rizky,
 
-            1. INFRASTRUCTURE SCAN (HADOLINT):
-            ${{ env.HADOLINT_LOG }}
+            Audit keamanan lengkap telah selesai. Berikut adalah lampiran laporan yang tersedia:
+            
+            1. hasil_scan_lengkap.txt (Seluruh proses dari script .sh)
+            2. hadolint-report.txt (Khusus detail Dockerfile)
+            3. trivy-report.txt (Khusus detail Library/Dependencies)
 
-            2. DEPENDENCY SCAN (TRIVY):
-            ${{ env.TRIVY_LOG }}
-
-            3. DYNAMIC SCAN (OWASP ZAP):
-            Status: Selesai. Silakan cek detail kerentanan pada link di bawah.
-
-            DETAIL LOG LENGKAP:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Silakan cek lampiran di bawah untuk detail teknisnya.
+          # Menambahkan semua file ke lampiran (dipisahkan koma)
+          attachments: hasil_scan_lengkap.txt,hadolint-report.txt,trivy-report.txt
