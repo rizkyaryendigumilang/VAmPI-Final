@@ -1,0 +1,56 @@
+name: DevSecOps-Audit-Email
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. SCAN DOCKERFILE
+      - name: Hadolint Scan
+        uses: hadolint/hadolint-action@v3.1.0
+        id: hadolint
+        with:
+          dockerfile: Dockerfile
+          ignore: DL3018
+          fail-on: error
+
+      # 2. SCAN DEPENDENCIES
+      - name: Trivy Scan
+        uses: aquasecurity/trivy-action@master
+        id: trivy
+        with:
+          scan-type: 'fs'
+          severity: 'CRITICAL,HIGH'
+          format: 'table'
+
+      # 3. KIRIM EMAIL (OTOMATIS SETELAH PUSH)
+      - name: Send Email Notification
+        if: always() # Tetap kirim meski scan ada yang gagal
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "[GitHub Actions] Security Audit Report - ${{ github.event.repository.name }}"
+          to: rizkyaryendigumilang@gmail.com
+          from: GitHub DevSecOps Bot
+          body: |
+            Halo Rizky,
+
+            Audit keamanan otomatis telah selesai dijalankan untuk commit: "${{ github.event.head_commit.message }}".
+
+            Hasil Audit:
+            - Hadolint (Docker): Selesai
+            - Trivy (Dependency): Selesai
+            
+            Detail log lengkap bisa dilihat di sini:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Status Workflow: ${{ job.status }}

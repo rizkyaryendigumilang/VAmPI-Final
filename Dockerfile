@@ -1,17 +1,23 @@
-FROM python:3.11-alpine as builder
-RUN apk --update add bash nano g++
-COPY ./requirements.txt /vampi/requirements.txt
-WORKDIR /vampi
-RUN pip install -r requirements.txt
+# Gunakan versi spesifik agar stabil
+FROM python:3.9-alpine
 
-# Build a fresh container, copying across files & compiled parts
-FROM python:3.11-alpine
-COPY . /vampi
-WORKDIR /vampi
-COPY --from=builder /usr/local/lib /usr/local/lib
-COPY --from=builder /usr/local/bin /usr/local/bin
-ENV vulnerable=1
-ENV tokentimetolive=60
+# Set folder kerja
+WORKDIR /app
 
-ENTRYPOINT ["python"]
-CMD ["app.py"]
+# Install library sistem tanpa cache agar aman
+RUN apk add --no-cache gcc musl-dev linux-headers
+
+# Copy file requirements saja dulu
+COPY requirements.txt .
+
+# Install library python tanpa cache
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy seluruh file aplikasi
+COPY . .
+
+# Port aplikasi
+EXPOSE 5000
+
+# Perintah menjalankan aplikasi
+CMD ["python", "app.py"]
