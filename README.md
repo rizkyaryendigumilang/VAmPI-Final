@@ -1,53 +1,64 @@
-# 🛡️ VAmPI: Secure API Pipeline (DevSecOps Implementation)
+# 🛡️ VAmPI: Ultimate DevSecOps & Automated Pentesting
+**The Vulnerable API (Based on OpenAPI 3) with Multi-Layered Security Scanning**
 
-![Security scanning](https://github.com/rizkyaryendigumilang/VAmPI-Final/actions/workflows/devsecops.yml/badge.svg)
+![Security Scanning](https://github.com/rizkyaryendigumilang/VAmPI-Final/actions/workflows/devsecops.yml/badge.svg)
 ![Build Status](https://img.shields.io/badge/Build-Success-brightgreen)
-![DevSecOps](https://img.shields.io/badge/Role-DevSecOps_&_Pentesting-blue)
+![DevSecOps](https://img.shields.io/badge/Security-Full_Automation-blue)
 
-## 📌 Deskripsi Project
-Project ini mendemonstrasikan integrasi keamanan otomatis ke dalam siklus deployment aplikasi (CI/CD). Menggunakan aplikasi **VAmPI** (Vulnerable API) sebagai target, saya telah membangun sistem "Security Guard" otomatis yang melakukan scanning.
+## 📌 Project Overview
+**VAmPI** is a Flask-based vulnerable API containing the OWASP Top 10 API Security Risks. 
 
-## 🚀 Fitur Keamanan (The Success Story)
+This project goes beyond just running a vulnerable app; it implements a **Full-Spectrum DevSecOps Pipeline**. Every code change triggers an automated "Security Guard" that performs a 360-degree audit—from infrastructure and libraries to source code and runtime behavior.
 
-Sistem ini berhasil menggabungkan tiga pilar utama keamanan informasi:
+---
+
+## 🚀 The Multi-Layer Security Stack
+
+This pipeline integrates four essential security pillars:
 
 ### 1. **Infrastructure as Code (IaC) Scanning**
-* **Tool:** Hadolint
-* **Fungsi:** Mendeteksi kesalahan konfigurasi pada `Dockerfile`.
-* **Keberhasilan:** Memastikan container berjalan dengan *Best Practices*, mencegah penggunaan *root user* yang berbahaya, dan menjaga ukuran image tetap efisien.
+* **Tool:** **Hadolint**
+* **Function:** Scanning the `Dockerfile` for misconfigurations.
+* **Outcome:** Prevents insecure root access and ensures container best practices.
 
-### 2. **Software Supply Chain Security (SCA)**
-* **Tool:** Trivy
-* **Fungsi:** Memindai library (dependencies) yang ada di `requirements.txt`.
-* **Keberhasilan:** Mendeteksi kerentanan kritis (CVE) pada library pihak ketiga secara otomatis sebelum aplikasi dideploy.
+### 2. **Software Composition Analysis (SCA)**
+* **Tool:** **Trivy**
+* **Function:** Scans third-party libraries (`requirements.txt`) for known CVEs.
+* **Outcome:** Detects vulnerable dependencies before they reach production.
 
-### 3. **Dynamic Application Security Testing (DAST)**
+### 3. **Static Application Security Testing (SAST)**
+* **Tool:** **Semgrep**
+* **Function:** Analyzes the Python/Flask source code for logic flaws and insecure patterns.
+* **Outcome:** Identifies SQL Injection, hardcoded secrets, and weak JWT configurations at the code level.
+
+### 4. **Dynamic Application Security Testing (DAST)**
 * **Tool:** **OWASP ZAP (Zaproxy)**
-* **Fungsi:** Melakukan pengujian penetrasi (Pentesting) secara dinamis terhadap aplikasi yang sedang berjalan (runtime).
-* **Keterangan:** Menggunakan **ZAP Baseline Scan** untuk memindai endpoint API secara otomatis. Tool ini mensimulasikan serangan nyata dari luar sistem untuk menemukan celah keamanan yang tidak terlihat pada code sumber (static), seperti kerentanan pada respon HTTP dan konfigurasi server.
-* **Keberhasilan:** Berhasil mendeteksi celah kritis seperti *Missing Security Headers*, *Storable and Cacheable Content*, serta *Site Isolation Issues (Spectre)* pada aplikasi runtime.
+* **Function:** Performs automated penetration testing on the running API.
+* **Outcome:** Simulates real-world attacks to find runtime vulnerabilities like *Security Misconfigurations* and *Insufficient Site Isolation (Spectre)*.
 
 ---
 
-## 🛠️ Alur Kerja DevSecOps (Automation)
-
-Setiap kali saya melakukan `git push`, robot **GitHub Actions** menjalankan tugas berikut secara otomatis:
-
-1. **Automated Scanning:** Menjalankan script `scan_otomatis.sh` yang merangkum seluruh temuan.
-2. **Container Testing:** Membangun dan menjalankan aplikasi di lingkungan virtual yang terisolasi.
-3. **Security Pentest:** **OWASP ZAP** menyerang aplikasi yang aktif untuk mencari celah keamanan nyata (Dynamic Analysis).
-4. **Instant Reporting:** Mengirimkan laporan detail (`.txt` & log) langsung ke email saya sebagai pemberitahuan hasil scanning.
+## 🛠️ Automated Workflow (CI/CD)
+The system is orchestrated via **GitHub Actions** with the following flow:
+1. **Static Phase:** Runs `scan_otomatis.sh` which executes **Hadolint, Trivy, and Semgrep**.
+2. **Build Phase:** Builds the Docker image and deploys the VAmPI container in an isolated environment.
+3. **Dynamic Phase:** **OWASP ZAP** performs an automated pentest against the live endpoint.
+4. **Instant Reporting:** A comprehensive Scanning report is sent directly to the developer's email.
 
 ---
 
-## 📂 Struktur Laporan Otomatis
-Laporan yang dihasilkan oleh sistem ini meliputi:
-* `hasil_scan_lengkap.txt`: Rekaman seluruh proses scanning terminal dari script otomatisasi.
-* `hadolint-report.txt`: Detail kepatuhan keamanan Docker.(IaC)
-* `trivy-report.txt`: Daftar kerentanan pada library aplikasi (SCA).
-* `zap-log.txt`: Hasil pengujian penetrasi dinamis (DAST) dari OWASP ZAP.
+## 📂 Scanning Reports Structure
+Each pipeline run generates five detailed security reports:
+* `hasil_scan_lengkap.txt`: Full terminal scanning trail.
+* `hadolint-report.txt`: Infrastructure compliance details.
+* `trivy-report.txt`: Dependency vulnerability list (SCA).
+* `semgrep-report.txt`: Source code security findings (SAST).
+* `zap-log.txt`: Dynamic penetration testing results (DAST).
 
 ---
 
-## 👨‍💻 Tujuan Project
-Project ini membuktikan bahwa keamanan bukan lagi penghambat kecepatan coding, melainkan bagian dari otomatisasi. Dengan sistem ini, kerentanan dapat ditemukan dan diperbaiki **lebih awal** (*Shift-Left Security*) sebelum mencapai tangan pengguna.
+## 👨‍💻 Project Mission
+To prove that security is not a blocker, but an enabler. By shifting security to the left (**Shift-Left Security**), we can build applications that are resilient by design and secure by default.
+
+---
+*Created for Learning/Teaching and Evaluating Security Automation Tools.*
