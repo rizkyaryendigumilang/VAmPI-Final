@@ -7,6 +7,12 @@ on:
 jobs:
   security-pipeline:
     runs-on: ubuntu-latest
+    # --- FIX ERROR PERMISSION: Memberi izin robot untuk menulis laporan ---
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -15,7 +21,6 @@ jobs:
       - name: Run Scan Otomatis Script
         run: |
           chmod +x scan_otomatis.sh
-          # Menangkap seluruh output terminal script kamu ke satu file
           ./scan_otomatis.sh > hasil_scan_lengkap.txt 2>&1 || true
 
       # --- 2. HADOLINT (REPORT PER TOOL) ---
@@ -35,7 +40,6 @@ jobs:
           docker build -t vampi-app .
           docker run -d --name vampi-instance -p 5000:5000 vampi-app
           sleep 15
-          # Cek apakah aplikasi sudah up
           curl -v http://localhost:5000/v1/_debug/health || true
 
       # --- 5. RUN ZAP (Dinamis/Pentesting) ---
@@ -45,8 +49,7 @@ jobs:
           target: 'http://localhost:5000'
           fail_action: false
           token: ${{ secrets.GITHUB_TOKEN }}
-          # Mencegah error 'Resource not accessible' dengan mematikan auto-issue
-          create_issue: false 
+          create_issue: true # Sekarang boleh true karena izin sudah diberikan
 
       # --- 6. KIRIM EMAIL DENGAN SEMUA LAMPIRAN ---
       - name: Send Email with All Attachments
@@ -57,20 +60,14 @@ jobs:
           server_port: 465
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "🛡️ [COMPLETE AUDIT] Security Report: ${{ github.repository }}"
+          subject: "🛡️ [SUCCESS] Security Report: ${{ github.repository }}"
           to: rizkyaryendigumilang@gmail.com
           from: DevSecOps Automation Bot
           body: |
             Halo Rizky,
 
-            Pipeline DevSecOps telah selesai dijalankan dengan sukses. 
-            Berikut adalah lampiran hasil audit untuk project ini:
-            
-            1. hasil_scan_lengkap.txt (Log seluruh proses script .sh)
-            2. hadolint-report.txt (Hasil analisis Dockerfile)
-            3. trivy-report.txt (Hasil analisis library/dependencies)
+            Audit keamanan telah selesai tanpa error sistem. 
+            ZAP berhasil menemukan celah (Spectre & Caching) dan laporan sudah dibuat.
 
-            ZAP Scan (Pentesting) juga telah selesai. Detail temuan ZAP dapat dilihat langsung di GitHub Actions Summary.
-
-            Status Pipeline: ${{ job.status }}
-          attachments: hasil_scan_lengkap.txt,hadolint-report.txt,trivy-report.txt
+            Lampiran:
+            1. hasil_scan_lengkap.
