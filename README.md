@@ -61,4 +61,6 @@ Plaintext
 === WAF SECURITY ALERT ===
 Detail Serangan Terakhir:
 🕒 Jam: [06/Feb/2026] | 🌐 IP: 172.18.0.1 | 🚨 Serangan: /api/v1/users/vampi%27%20OR%201=1
+
 Created by Rizky Aryendi Gumilang
+` ````
