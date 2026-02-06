@@ -45,13 +45,20 @@ Seluruh temuan keamanan dikumpulkan secara otomatis ke dalam folder audit:
 ```bash
 git clone [https://github.com/rizkyaryendigumilang/VAmPI-automated-api-security-scanning.git](https://github.com/rizkyaryendigumilang/VAmPI-automated-api-security-scanning.git)
 cd VAmPI-automated-api-security-scanning
+2. Jalankan Infrastruktur (API + Nginx WAF)
+Bash
 docker-compose up -d --build
+3. Eksekusi Security Scan
+Bash
 chmod +x scan_otomatis.sh
 ./scan_otomatis.sh
-Proof of Concept (WAF Blocking)
+🔍 Proof of Concept (WAF Blocking)
 Percobaan Serangan: curl -I "http://localhost/api/v1/users/vampi%27%20OR%201=1"
 
 Output di alert_email_siap_kirim.txt:
+
+Plaintext
 === WAF SECURITY ALERT ===
 Detail Serangan Terakhir:
 🕒 Jam: [06/Feb/2026] | 🌐 IP: 172.18.0.1 | 🚨 Serangan: /api/v1/users/vampi%27%20OR%201=1
+Created by Rizky Aryendi Gumilang
